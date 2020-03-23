@@ -7,7 +7,7 @@ steps:
   vault:
     title: Importing vault values...
     stage: "vault"
-    type: anna-codefresh/vault-fix
+    type: vault
     arguments:
       VAULT_ADDR: 'http://<YOUR_VAULT_SERVER_IP>:<PORT>'
       VAULT_PATH: 'path/to/secret'
