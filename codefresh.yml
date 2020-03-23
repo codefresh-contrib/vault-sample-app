@@ -6,36 +6,30 @@ stages:
   - "package"
 steps:
   vault:
-    title: Importing vault values
+    title: Importing vault values...
     stage: "vault"
-    type: vault
+    type: anna-codefresh/vault-fix
     arguments:
-      VAULT_ADDR: 'http://192.81.218.202:8200'
-      VAULT_PATH: 'kv/secret'
-      VAULT_AUTH_TOKEN: 's.PcrFlQcqyFlynjWkjNAjOaOQ'
-  use_vault_secret:
-    title: Using secret
-    stage: "integration-test"
-    image: alpine:3.9
-    commands:
-      - echo $password
+      VAULT_ADDR: 'http://<YOUR_VAULT_SERVER_IP>:<PORT>'
+      VAULT_PATH: 'path/to/secret'
+      VAULT_AUTH_TOKEN: '<YOUR_VAULT_AUTH_TOKEN>'
   main_clone:
     title: Cloning main repository...
     type: git-clone
-    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
-    revision: '${{CF_REVISION}}'
+    repo: 'codefresh-contrib/vault-sample-app'
+    git: github
     stage: clone
   package_jar:
     title: Packaging jar and running unit tests...
-    image: maven:3.5.2-jdk-8-alpine
     stage: package
+    image: maven:3.5.2-jdk-8-alpine
     working_directory: ./
     commands:
-      - mvn clean package -Dmaven.repo.local=/codefresh/volume/m2_repository
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository -Dserver.host=my-redis-db-host clean package
     services:
       composition:
         my-redis-db-host:
           image: 'redis:4-alpine'
-          command: 'redis-server --requirepass ${{password}}'
+          command: 'redis-server --requirepass $password'
           ports:
             - 6379
